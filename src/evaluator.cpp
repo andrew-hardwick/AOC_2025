@@ -1,5 +1,6 @@
-#include "d01.h"
 #include "evaluator.h"
+
+#include "d01.h"
 
 #include <chrono>
 #include <iostream>
