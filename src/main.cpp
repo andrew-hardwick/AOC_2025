@@ -1,5 +1,4 @@
 #include "argumentParsing.h"
-
 #include "evaluator.h"
 
 int main(int argc, char** argv) {

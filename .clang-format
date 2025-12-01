@@ -7,4 +7,12 @@ Language: Cpp
 DerivePointerAlignment: false
 PointerAlignment: Left
 SeparateDefinitionBlocks: Always
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '"*"'
+    Priority: 0
+    SortPriority: 0
+  - Regex: '<*>'
+    Priority: 2
+    SortPriority: 2
 ---

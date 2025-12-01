@@ -1,10 +1,9 @@
+#include "d01.h"
 #include "evaluator.h"
 
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
-
-#include "d01.h"
 
 namespace advent {
 void evaluate(uint8_t day, const std::string& inFilename, bool verbose) {

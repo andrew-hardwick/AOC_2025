@@ -1,5 +1,4 @@
 #include "point.h"
-
 #include "stringUtils.h"
 
 #include <string>

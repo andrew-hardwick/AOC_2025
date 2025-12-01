@@ -5,6 +5,6 @@
 
 namespace advent::d01 {
 std::pair<adventFunctor, adventFunctor> getParts();
-} // namespace advent::day01
+} // namespace advent::d01
 
 #endif
