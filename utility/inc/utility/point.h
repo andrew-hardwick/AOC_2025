@@ -1,5 +1,5 @@
-#ifndef ADVENT_UTILITY_POINT_H
-#define ADVENT_UTILITY_POINT_H
+#ifndef ADVENT_POINT_H
+#define ADVENT_POINT_H
 
 #include <ostream>
 
