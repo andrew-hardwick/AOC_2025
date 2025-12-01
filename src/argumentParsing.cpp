@@ -1,5 +1,4 @@
 #include "argumentParsing.h"
-#include <iostream>
 #include <tuple>
 
 namespace advent::argumentParsing {
