@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cstdlib>
 #include <string>
 
 namespace advent::d01 {

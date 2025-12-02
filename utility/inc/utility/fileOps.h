@@ -5,6 +5,8 @@
 #include <vector>
 
 namespace advent::utility::fileOps {
+bool doesFileExist(const std::string& inFilename);
+
 std::string readFileRaw(const std::string& inFilename);
 
 std::vector<char> readFileToChars(const std::string& inFilename);

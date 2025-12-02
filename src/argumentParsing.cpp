@@ -1,5 +1,8 @@
 #include "argumentParsing.h"
 
+#include "utility/inc/utility/fileOps.h"
+
+#include <iostream>
 #include <tuple>
 
 namespace advent::argumentParsing {
@@ -53,6 +56,13 @@ std::tuple<uint8_t, std::string, bool> parseArguments(int argc, char** argv) {
     std::string daySource(arguments.args[0]);
     uint8_t day = std::stoul(daySource);
     std::string inFilename(arguments.args[1]);
+
+    if (!advent::utility::fileOps::doesFileExist(inFilename)) {
+        std::cout << "File '" << inFilename
+                  << "' either does not exist or is a directory. Please "
+                     "specify an advent input file\n";
+        exit(1);
+    }
 
     bool verbose = arguments.verbose == 1;
 

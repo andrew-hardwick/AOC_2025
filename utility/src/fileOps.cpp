@@ -1,11 +1,21 @@
 #include "fileOps.h"
 
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace advent::utility::fileOps {
+bool doesFileExist(const std::string& inFilename) {
+    std::filesystem::path inPath{inFilename};
+
+    if (!std::filesystem::exists(inPath))
+        return false;
+
+    return !std::filesystem::is_directory(inPath);
+}
+
 std::string readFileRaw(const std::string& inFilename) {
     std::ifstream inf(inFilename);
 
