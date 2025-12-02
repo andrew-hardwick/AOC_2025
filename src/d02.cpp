@@ -53,7 +53,7 @@ bool isMatchingSubstringsOfLength(const uint64_t& target, std::size_t length,
 
     auto modMask = pow10[subLength];
 
-    for (std::size_t i = 1; i < count; i++) {
+    for (std::size_t i = 1; i < count; ++i) {
         auto ordReduction = pow10[subLength * (i - 1)];
         auto other = (target / ordReduction) % modMask;
 
@@ -98,7 +98,7 @@ bool isInvalidIdP2(uint64_t id) {
     if (length == 1)
         return false;
 
-    for (std::size_t subLength = 1; subLength <= length / 2; subLength++) {
+    for (std::size_t subLength = 1; subLength <= length / 2; ++subLength) {
         if (length % subLength != 0)
             continue;
 
