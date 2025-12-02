@@ -10,6 +10,10 @@ std::vector<std::string> split(std::string source,
 
 std::vector<std::string> split(const std::string& source, char delimiter);
 
+std::vector<std::string> equalSubStrsOfLength(const std::string& source,
+                                              std::size_t length,
+                                              std::size_t subLength);
+
 std::vector<int> convertToIntArray(const std::vector<std::string>& source);
 
 std::vector<int> parseToIntArray(const std::string& source,

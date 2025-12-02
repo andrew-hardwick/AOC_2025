@@ -2,6 +2,7 @@
 #define ADVENT_ARGUMENT_PARSING_H
 
 #include <argp.h>
+
 #include <cstdint>
 #include <string>
 #include <tuple>

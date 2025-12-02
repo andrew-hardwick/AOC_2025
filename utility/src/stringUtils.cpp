@@ -2,9 +2,7 @@
 
 #include <sstream>
 
-namespace advent {
-namespace utility {
-namespace string {
+namespace advent::utility::string {
 std::vector<std::string> split(std::string source,
                                const std::string& delimiter) {
     std::vector<std::string> result;
@@ -35,6 +33,20 @@ std::vector<std::string> split(const std::string& source, char delimiter) {
     std::string strDelimiter{delimiter};
 
     return split(source, strDelimiter);
+}
+
+std::vector<std::string> equalSubStrsOfLength(const std::string& source,
+                                              std::size_t length,
+                                              std::size_t subLength) {
+    auto count = length / subLength;
+
+    std::vector<std::string> result(count);
+
+    for (std::size_t i = 0; i < count; ++i) {
+        result[i] = source.substr(i * subLength, subLength);
+    }
+
+    return result;
 }
 
 std::vector<int> convertToIntArray(const std::vector<std::string>& source) {
@@ -99,6 +111,4 @@ std::string replace(const std::string& source,
 
     return working;
 }
-} // namespace string
-} // namespace utility
-} // namespace advent
+} // namespace advent::utility::string

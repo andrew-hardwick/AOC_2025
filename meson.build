@@ -1,4 +1,4 @@
-project('advent-of-code', 'cpp', default_options: ['default_library=static', 'warning_level=1', 'werror=false', 'cpp_std=c++17', ], version:'0.0.1')
+project('advent-of-code', 'cpp', default_options: ['default_library=static', 'warning_level=1', 'werror=false', 'cpp_std=c++17', 'optimization=3', ], version:'0.0.1')
 
 dir_base = meson.current_source_dir()
 
