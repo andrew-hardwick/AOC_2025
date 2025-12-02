@@ -2,6 +2,7 @@
 
 #include "d01.h"
 #include "d02.h"
+#include "d03.h"
 
 #include <chrono>
 #include <iostream>
@@ -41,6 +42,8 @@ std::pair<adventFunctor, adventFunctor> getDay(uint8_t day) {
         return d01::getParts();
     case 2:
         return d02::getParts();
+	case 3:
+		return d03::getParts();
     }
 
     throw std::invalid_argument("Encountered unparseable year");
