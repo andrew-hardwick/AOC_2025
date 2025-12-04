@@ -16,6 +16,7 @@ source = [
   'src/d02.cpp',
   'src/d03.cpp',
   'src/d04.cpp',
+  'src/d05.cpp',
 ]
 
 adventUtility = subproject('adventUtility')
