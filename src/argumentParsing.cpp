@@ -1,6 +1,6 @@
 #include "argumentParsing.h"
 
-#include "utility/inc/utility/fileOps.h"
+#include <fileOps.h>
 
 #include <iostream>
 #include <tuple>

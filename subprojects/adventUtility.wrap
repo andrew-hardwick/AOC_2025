@@ -1,0 +1,4 @@
+[wrap-git]
+url = https://github.com/andrew-hardwick/advent_utility.git
+revision = HEAD
+depth = 1

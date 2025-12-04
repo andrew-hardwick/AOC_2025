@@ -1,6 +1,7 @@
 #include "adventTypedef.h"
-#include "utility/inc/utility/fileOps.h"
-#include "utility/inc/utility/stringUtils.h"
+
+#include <fileOps.h>
+#include <stringUtils.h>
 
 #include <algorithm>
 #include <cstdint>
