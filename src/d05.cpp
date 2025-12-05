@@ -11,7 +11,7 @@ struct freshRange {
     int64_t start;
     int64_t end;
 
-    bool inRange(uint64_t val) const {
+    bool inRange(int64_t val) const {
         return val >= start && val <= end;
     }
 
@@ -29,12 +29,12 @@ freshRange parseRange(const std::string& line) {
     return {std::stol(splitLine[0]), std::stol(splitLine[1])};
 }
 
-std::pair<std::vector<freshRange>, std::vector<uint64_t>>
+std::pair<std::vector<freshRange>, std::vector<int64_t>>
 loadAndParse(const std::string& inFilename) {
     auto source = utility::fileOps::readFileToLines(inFilename);
 
     std::vector<freshRange> ranges;
-    std::vector<uint64_t> ingredients;
+    std::vector<int64_t> ingredients;
     bool pastRanges = false;
 
     for (const auto& line : source) {
@@ -46,7 +46,7 @@ loadAndParse(const std::string& inFilename) {
         if (!pastRanges) {
             ranges.push_back(parseRange(line));
         } else {
-            ingredients.push_back(std::stoul(line));
+            ingredients.push_back(std::stol(line));
         }
     }
 
