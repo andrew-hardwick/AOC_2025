@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iostream>
 #include <string>
 
 namespace advent::d05 {
@@ -33,22 +34,35 @@ std::pair<std::vector<freshRange>, std::vector<int64_t>>
 loadAndParse(const std::string& inFilename) {
     auto source = utility::fileOps::readFileToLines(inFilename);
 
-    std::vector<freshRange> ranges;
-    std::vector<int64_t> ingredients;
     bool pastRanges = false;
 
+    std::size_t rangeCount = 0;
+    std::size_t ingredientCount = 0;
+
     for (const auto& line : source) {
+        if (pastRanges) {
+            ++ingredientCount;
+            continue;
+        }
+
         if (line == "") {
             pastRanges = true;
             continue;
         }
 
-        if (!pastRanges) {
-            ranges.push_back(parseRange(line));
-        } else {
-            ingredients.push_back(std::stol(line));
-        }
+		++rangeCount;
     }
+
+    std::vector<freshRange> ranges(rangeCount);
+    std::vector<int64_t> ingredients(ingredientCount);
+
+	for (std::size_t i = 0; i < rangeCount; ++i)
+		ranges[i] = parseRange(source[i]);
+
+	for (std::size_t i= rangeCount + 1, o = 0; o < ingredientCount; ++i, ++o)
+		ingredients[o] = std::stol(source[i]);
+
+	std::sort(ranges.begin(), ranges.end());
 
     return {ranges, ingredients};
 }
@@ -73,8 +87,6 @@ std::string p1(const std::string& inFilename) {
 std::string p2(const std::string& inFilename) {
     auto [freshRanges, _] = loadAndParse(inFilename);
 
-    std::sort(freshRanges.begin(), freshRanges.end());
-
     int64_t count = 0;
     int64_t lastEdge = 0;
 
@@ -84,9 +96,9 @@ std::string p2(const std::string& inFilename) {
 
         uint64_t thisRangeWidth = end - start + 1;
 
-        if (start <= lastEdge) {
+        if (start <= lastEdge) 
             thisRangeWidth -= (lastEdge - start) + 1;
-        }
+        
         lastEdge = end;
 
         count += thisRangeWidth;
