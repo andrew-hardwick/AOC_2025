@@ -1,19 +1,27 @@
 #include "adventTypedef.h"
 #include "fileOps.h"
-#include "stringUtils.h"
 
-#include <algorithm>
 #include <cstdint>
 #include <ctime>
-#include <iostream>
+#include <functional>
 #include <map>
 #include <string>
 
 namespace fileOps = advent::utility::fileOps;
-namespace string = advent::utility::string;
 
 namespace advent::d06 {
 enum class op_t { MUL, ADD, UNK };
+
+op_t from(const char& c) {
+    switch (c) {
+    case '+':
+        return op_t::ADD;
+    case '*':
+        return op_t::MUL;
+    default:
+        return op_t::UNK;
+    }
+}
 
 op_t parseOp(const std::string& source) {
     if (source == "+")
@@ -28,79 +36,7 @@ std::map<op_t, std::function<uint64_t(uint64_t, uint64_t)>> opMap{
     {op_t::MUL, std::multiplies()},
 };
 
-std::tuple<std::vector<uint64_t>, uint16_t, uint16_t, std::vector<op_t>>
-loadAndParsePart1(const std::string& inFilename) {
-    auto source = fileOps::readFileToLines(inFilename);
-
-    std::vector<uint64_t> numbers;
-    std::vector<op_t> ops;
-
-    uint16_t rowLength = 0;
-    uint16_t rowCount = 0;
-
-    std::vector<std::string> cleanupTargets{" ", "  ", "   "};
-    std::vector<std::string> cleanupReplacements{" ", " ", " "};
-
-    for (const auto& line : source) {
-        auto cleaned =
-            string::replace(line, cleanupTargets, cleanupReplacements);
-
-        auto split = string::split(cleaned, " ", false, false);
-
-        if (split[0] == "+" || split[0] == "*") {
-            ops.resize(split.size());
-
-            std::transform(split.cbegin(), split.cend(), ops.begin(), parseOp);
-
-            continue;
-        }
-
-        ++rowCount;
-
-        if (rowLength == 0)
-            rowLength = split.size();
-
-        numbers.reserve(numbers.size() + rowLength);
-
-        for (auto e : split)
-            numbers.push_back(std::stol(e));
-    }
-
-    return {numbers, rowLength, rowCount, ops};
-}
-
-uint64_t calculateColumnPartOne(const std::vector<uint64_t> numbers,
-                                uint16_t rowCount, uint64_t rowLength,
-                                uint64_t col, op_t op) {
-
-    uint64_t result = op == op_t::ADD ? 0 : 1;
-
-    for (uint64_t row = 0; row < rowCount; ++row) {
-        uint64_t index = row * rowLength + col;
-        uint64_t e = numbers[index];
-
-        result = opMap[op](result, e);
-    }
-
-    return result;
-}
-
-std::string p1(const std::string& inFilename) {
-    auto [numbers, rowLength, rowCount, ops] = loadAndParsePart1(inFilename);
-
-    uint64_t total = 0;
-
-    for (uint64_t col = 0; col < ops.size(); ++col) {
-        auto e =
-            calculateColumnPartOne(numbers, rowCount, rowLength, col, ops[col]);
-
-        total += e;
-    }
-
-    return std::to_string(total);
-}
-
-uint64_t computePartTwo(const std::vector<uint64_t>& nums, op_t op) {
+uint64_t foldOp(const std::vector<uint64_t>& nums, op_t op) {
     uint64_t result = op == op_t::ADD ? 0 : 1;
 
     auto opF = opMap[op];
@@ -112,57 +48,121 @@ uint64_t computePartTwo(const std::vector<uint64_t>& nums, op_t op) {
     return result;
 }
 
-std::tuple<bool, uint64_t>
-parseNumPartTwo(const std::vector<std::string>& source, std::size_t index) {
-    bool allBlank = true;
-    uint64_t result = 0;
-    for (const auto& line : source) {
-        auto c = line[index];
+std::tuple<std::vector<std::size_t>, std::vector<op_t>>
+identifyOpColumns(const std::string& opLine) {
+    std::vector<std::size_t> resultIndices;
+    std::vector<op_t> resultOps;
 
+    char previousC = opLine[0];
+
+    for (std::size_t i = 1; i < opLine.size(); i++) {
+        auto c = opLine[i];
         if (c != ' ') {
-            allBlank = false;
-
-            result *= 10;
-            result += (uint64_t)(c - '0');
+            resultIndices.push_back(i - 1);
+            resultOps.push_back(from(previousC));
+            previousC = c;
         }
     }
 
-    return {allBlank, result};
+    resultIndices.push_back(opLine.size());
+    resultOps.push_back(from(previousC));
+
+    return {resultIndices, resultOps};
 }
 
-std::string p2(const std::string& inFilename) {
+std::tuple<std::vector<std::string>, std::string>
+loadSource(const std::string& inFilename) {
     auto source = fileOps::readFileToLines(inFilename);
 
     std::vector<std::string> numbersSource(source.begin(), source.end() - 1);
     std::string opSource{*(source.end() - 1)};
 
-    std::vector<uint64_t> groupNums;
-    op_t op = op_t::UNK;
+    return {numbersSource, opSource};
+}
+
+std::vector<uint64_t>
+parseNumberGroupPartOne(const std::vector<std::string>& numbersSource,
+                        std::size_t groupSize, std::size_t groupStart,
+                        std::size_t groupLength) {
+    std::vector<uint64_t> group(groupSize);
+
+    for (std::size_t j = 0; j < groupSize; ++j) {
+        auto numSource = numbersSource[j].substr(groupStart, groupLength);
+
+        group[j] = std::stol(numSource);
+    }
+
+    return group;
+}
+
+std::vector<uint64_t>
+parseNumberGroupPartTwo(const std::vector<std::string>& numbersSource,
+                        std::size_t groupSize, std::size_t groupStart,
+                        std::size_t groupLength) {
+    std::vector<uint64_t> group(groupLength, 0);
+
+    for (std::size_t i = 0; i < groupSize; ++i) {
+        for (std::size_t j = 0; j < groupLength; ++j) {
+            auto c = numbersSource[i][groupStart + j];
+            if (c != ' ') {
+                group[j] *= 10;
+                group[j] += (c - '0');
+            }
+        }
+    }
+
+    return group;
+}
+
+using parseNumberGroup_t = std::function<std::vector<uint64_t>(
+    const std::vector<std::string>&, std::size_t, std::size_t, std::size_t)>;
+
+std::vector<std::vector<uint64_t>>
+identifyNumberGroups(const std::vector<std::string>& numbersSource,
+                     const std::vector<std::size_t>& opColumns,
+                     parseNumberGroup_t parseNumberGroup) {
+    std::vector<std::vector<uint64_t>> result;
+
+    auto groupSize = numbersSource.size();
+    std::size_t groupStart = 0;
+
+    for (const auto& groupEnd : opColumns) {
+        std::size_t groupLength = groupEnd - groupStart;
+
+        auto group =
+            parseNumberGroup(numbersSource, groupSize, groupStart, groupLength);
+
+        result.push_back(group);
+
+        groupStart = groupEnd + 1;
+    }
+
+    return result;
+}
+
+std::string genericExecution(const std::string& inFilename,
+                             parseNumberGroup_t parseNumberGroup) {
+    auto [numbersSource, opSource] = loadSource(inFilename);
+
+    auto [opColumns, ops] = identifyOpColumns(opSource);
+
+    auto numberGroups =
+        identifyNumberGroups(numbersSource, opColumns, parseNumberGroup);
 
     uint64_t total = 0;
 
-	groupNums.reserve(10);
+    for (std::size_t i = 0; i < opColumns.size(); i++)
+        total += foldOp(numberGroups[i], ops[i]);
 
-    for (std::size_t c = 0; c < opSource.size(); ++c) {
-        auto opC = opSource[c];
+    return std::to_string(total);
+}
 
-        if (opC != ' ') {
-            if (op != op_t::UNK)
-                total += computePartTwo(groupNums, op);
+std::string p1(const std::string& inFilename) {
+    return genericExecution(inFilename, parseNumberGroupPartOne);
+}
 
-            groupNums.clear();
-            op = opC == '+' ? op_t::ADD : op_t::MUL;
-        }
-
-        auto [allBlank, num] = parseNumPartTwo(numbersSource, c);
-
-		if (!allBlank)
-			groupNums.push_back(num);
-    }
-
-	total += computePartTwo(groupNums,  op);
-
-	return std::to_string(total);
+std::string p2(const std::string& inFilename) {
+    return genericExecution(inFilename, parseNumberGroupPartTwo);
 }
 
 std::pair<adventFunctor, adventFunctor> getParts() {
